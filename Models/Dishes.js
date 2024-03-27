@@ -14,7 +14,8 @@ const dishSchema = new mongoose.Schema({
     required: true
   },
   category: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId, // Reference to a Category document
+    ref: 'Category', // Reference to the Category collection
     required: true
   },
   image: {
@@ -33,23 +34,26 @@ const dishSchema = new mongoose.Schema({
     type: [String],
     default: []
   },
-  ratings: [
-    {
-      userId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        required: true
-      },
-      rating: {
-        type: Number,
-        required: true
-      },
-      review: {
-        type: String,
-        required: true
+  ratings: {
+    type: [
+      {
+        userId: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'User',
+          required: true
+        },
+        rating: {
+          type: Number,
+          required: true
+        },
+        review: {
+          type: String,
+          required: true
+        }
       }
-    }
-  ],
+    ],
+    default: []
+  },
   availabilitySchedule: {
     dayOfWeek: {
       type: [Number],
@@ -84,6 +88,10 @@ const dishSchema = new mongoose.Schema({
     type: [mongoose.Schema.Types.ObjectId],
     ref: 'Dish',
     default: []
+  },
+  isDeleted:{
+    type:Boolean,
+    default:false
   }
 });
 

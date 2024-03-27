@@ -4,7 +4,7 @@ const orderSchema = new mongoose.Schema({
     customerId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Customer',
-        required: true
+        default: null
     },
     orderItems: [{
         dishId: {
@@ -18,8 +18,9 @@ const orderSchema = new mongoose.Schema({
         }
     }],
     totalAmount: {
-        type: Number,
-        required: true
+        type: Number, // Store the total amount directly in the database
+        required: true,
+        default:0
     },
     orderStatus: {
         type: String,
