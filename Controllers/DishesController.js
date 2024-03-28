@@ -7,21 +7,22 @@ module.exports = {
       // Define pagination parameters
       const perPage = 5;
       const page = parseInt(req.query.page) || 1;
-
-      // Fetch dishes, sorted by creation date in descending order
+  
+      // Fetch dishes, sorted by creation date in descending order, excluding soft-deleted dishes
       const data = await Dish.aggregate([
+        { $match: { IsDeleted: false } }, // Exclude soft-deleted dishes
         { $sort: { createdAt: -1 } },
         { $skip: perPage * (page - 1) }, // Skip dishes based on the current page
         { $limit: perPage } // Limit the number of dishes per page
       ]);
-
-      // Count total number of dishes
-      const count = await Dish.countDocuments({});
-
+  
+      // Count total number of non-deleted dishes
+      const count = await Dish.countDocuments({ IsDeleted: false });
+  
       // Calculate pagination information
       const nextPage = page + 1;
       const hasNextPage = nextPage <= Math.ceil(count / perPage);
-
+  
       // Send paginated dishes data along with pagination info in the response
       res.send({
         data,
@@ -38,16 +39,26 @@ module.exports = {
   // Controller function to find a dish by its ID
   findById: async (req, res) => {
     const id = req.params.id;
-    try {
-      const dish = await Dish.findById(id);
-      if (!dish) {
-        return res.status(404).json({ message: 'No dish found' });
-      } else {
-        return res.send(dish);
-      }
-    } catch (error) {
-      return res.status(500).json({ message: 'Internal Server Error' });
+  try {
+    // Look for the dish with the given id in the database
+    const dish = await Dish.findById(id);
+
+    // If the dish is not found, return a 404 response
+    if (!dish) {
+      return res.status(404).json({ message: 'No dish found' });
     }
+
+    // If the dish is soft deleted, return a 404 response
+    if (dish.IsDeleted) {
+      return res.status(404).json({ message: 'No dish found' });
+    }
+
+    // Otherwise, return the dish
+    return res.send(dish);
+  } catch (error) {
+    // If there's an error, return a 500 response
+    return res.status(500).json({ message: 'Internal Server Error' });
+  }
   },
   // Controller function to create a new dish
   createDish: async (req, res) => {
@@ -99,34 +110,44 @@ module.exports = {
       // Get the id from the request parameter
       const id = req.params.id;
       const updatedDish = req.body;
-
+  
       // Look for the dish with the given id in the database
       const dish = await Dish.findById(id);
       if (!dish) {
         return res.status(404).json({ message: 'The dish with the provided ID was not found.' });
-      } else {
-        // Update the dish object with the new data
-        Object.assign(dish, updatedDish);
-        // Save the updated dish to the database
-        await dish.save();
-        return res.status(200).json({ message: 'The dish was successfully updated.' });
       }
+  
+      // Check if the dish is soft deleted
+      if (dish.IsDeleted) {
+        return res.status(404).json({ message: 'The dish with the provided ID was not found.' });
+      }
+  
+      // Update the dish object with the new data
+      Object.assign(dish, updatedDish);
+  
+      // Save the updated dish to the database
+      await dish.save();
+  
+      return res.status(200).json({ message: 'The dish was successfully updated.' });
     } catch (err) {
-      console.log(err);
+      console.error(err);
       return res.status(500).json({ message: 'Internal Server Error' });
     }
   },
   // Controller function to delete an existing dish
   deleteDish: async function (req, res) {
     try {
-      // Find and remove the dish with the given id from the database
-      const id = req.params.id;
-      if (!id) {
-        return res.status(404).json({ message: 'No dish with this id exists!' });
-      } else {
-        await Dish.findByIdAndDelete(id);
-        return res.status(200).json({ message: "Successfully deleted!" });
+      // Find the dish by ID
+      const dish = await Dish.findById(req.params.id);
+      if (!dish) {
+        return res.status(404).json({ message: 'No dish with this ID exists!' });
       }
+  
+      // Soft delete the dish by setting the IsDeleted flag to true
+      dish.IsDeleted = true;
+      await dish.save();
+  
+      return res.status(200).json({ message: 'Dish soft deleted successfully' });
     } catch (err) {
       console.error(err);
       return res.status(500).json({ message: 'Internal Server Error' });

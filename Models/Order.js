@@ -34,7 +34,11 @@ const orderSchema = new mongoose.Schema({
     updatedAt: {
         type: Date,
         default: Date.now
-    }
+    },
+    IsDeleted: {
+        type: Boolean,
+        default: false,
+      },
 });
 
 const Order = mongoose.model('Order', orderSchema);

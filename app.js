@@ -4,6 +4,7 @@ require('dotenv').config();
 const app = express();
 const adminRoute = require("./Routes/admin.js");
 const mainRoute=require("./Routes/main.js")
+const errorHandler = require('./middleware/Error.js');
 
 // Connect to the database
 connectDB();
@@ -30,10 +31,7 @@ app.use('/user', adminRoute);
 app.use('/', mainRoute);
 
 // Error handling middleware
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).send('Something went wrong!');
-});
+app.use(errorHandler);
 
 // Start the server
 const PORT = process.env.PORT || 4000;

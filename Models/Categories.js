@@ -8,14 +8,17 @@ const CategoriesSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
+    unique: true,
+    
   },
+
   image: {
     type: String,
     required: true,
   },
-  status: {
+  IsDeleted: {
     type: Boolean,
-    required: true,
+    default: false,
   },
 });
 

@@ -22,6 +22,14 @@ const customerSchema = new mongoose.Schema({
     updatedAt: {
         type: Date,
         default: Date.now
+    },
+    IsDeleted: {
+        type: Boolean,
+        default: false,
+      },
+     role: {
+        type: String, // Define possible roles (you can add more roles as needed)
+        default: 'customer' // Default role for new users
     }
 });
 

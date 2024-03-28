@@ -89,7 +89,7 @@ const dishSchema = new mongoose.Schema({
     ref: 'Dish',
     default: []
   },
-  isDeleted:{
+  IsDeleted:{
     type:Boolean,
     default:false
   }
