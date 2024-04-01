@@ -6,7 +6,7 @@ const user=require("../Controllers/userController")
 const express = require('express');
 const router = express.Router();
 
-const verifyTokenAndRole = require('../middleware/verifyToken');
+const verifyTokenAndRole = require('../middleware/verifyTokenUser');
 
 // Protected route that requires authentication
 // Apply verifyToken middleware to routes that need authentication

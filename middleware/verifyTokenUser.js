@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 
-const verifyTokenAndRole = (req, res, next) => {
+const verifyTokenAndUser = (req, res, next) => {
   const header = req.headers['authorization'];
   
   if (!header) {
@@ -13,12 +13,7 @@ const verifyTokenAndRole = (req, res, next) => {
     console.log(decoded);
     
     // Check the role field from the decoded token
-    if (decoded.role === 'customer') {
-      // Allow access for customers
-      req.customer = decoded;
-      req.userId = decoded.userId;
-      next();
-    } else if (decoded.role === 'user') {
+    if (decoded.role === 'user') {
       // Allow access for users
       req.user = decoded;
       req.userId = decoded.userId;
@@ -32,4 +27,4 @@ const verifyTokenAndRole = (req, res, next) => {
   }
 };
 
-module.exports = verifyTokenAndRole;
+module.exports = verifyTokenAndUser;

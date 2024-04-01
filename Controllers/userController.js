@@ -20,7 +20,7 @@ exports.createUser = async (req, res) => {
         await newUser.save();
 
         // Generate JWT token
-        const tokenUser = jwt.sign({ userId: User._id, role: User.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        const tokenUser = jwt.sign({ userId: User._id, role: 'user' }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
 
         // Send token back to the client
@@ -66,7 +66,7 @@ exports.getAllUsers = async (req, res) => {
         }
 
         // Generate JWT token
-        const tokenUser = jwt.sign({ userId: User._id, role: User.role }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        const tokenUser = jwt.sign({ userId: User._id, role: 'user' }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
 
         // Send token back to the client
